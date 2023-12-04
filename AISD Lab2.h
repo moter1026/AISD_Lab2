@@ -1,12 +1,14 @@
-﻿
+﻿#pragma once
 
 #include <iostream>
 #include <string>
+#include "includes/Lab1.h"
 
 template <typename T>
 class Node {
 private:
     T _val;
+    size_t _degree;
     Node<T>* _next;
     Node<T>* _prev;
 public:
@@ -15,44 +17,52 @@ public:
     // Конструктор копирования п.2 общ часть
     Node(Node& const node) {
         this->_val = node.getValue();
+        this->_degree = node.getDegree();
         this->_next = node.getNext();
         this->_prev = node.getPrev();
     }
+    Node(T val, size_t degree) {
+        this->_val = val;
+        this->_degree = degree;
+        this->_next = nullptr;
+        this->_prev = nullptr;
+    }
     Node(T val) {
         this->_val = val;
+        this->_degree = 0;
         this->_next = nullptr;
         this->_prev = nullptr;
     }
     Node(T val, Node<T>* prev) {
         this->_val = val;
+        this->setDegree(this->getPrev()->getDegree() + 1);
         this->_next = nullptr;
         this->_prev = prev;
     }
     
-    Node(const T& _val, Node<T>* _next, Node<T>* _prev) :
-        _val(_val), _next(_next), _prev(_prev) {}
-    Node<T>* getNext() const{
-        return this->_next;
-    }
+    Node(const T& val, size_t degree, Node<T>* next, Node<T>* prev) :
+        _val(val), _degree(degree), _next(next), _prev(prev){}
+    Node<T>* getNext() const{ return this->_next; }
     void setNext(Node<T>* next) {
         this->_next = next;
         return;
     }
-    Node<T>* getPrev() const {
-        return this->_prev;
-    }
+    Node<T>* getPrev() const { return this->_prev; }
     void setPrev(Node<T>* prev) {
         this->_prev = prev;
         return;
     }
-    T getValue() const {
-        return this->_val;
-    }
+    T getValue() const { return this->_val; }
     void setValue(T value) {
         this->_val = value;
         return;
     }
- 
+    size_t getDegree() { return this->_degree; }
+    void setDegree(size_t degree) {
+        this->_degree = degree;
+        return;
+    }
+
     void print() const {
         std::cout << this->_val;
         return;
@@ -88,11 +98,11 @@ private:
     Node<T>* _last;
     size_t _countNodes;
 protected:
-    void setFirst(const Node<T>* const first) {
+    void setFirst(Node<T>* first) {
         this->_first = first;
         return;
     }
-    void setLast(const Node<T>* const last) {
+    void setLast(Node<T>* last) {
         this->_last = last;
         return;
     }
@@ -102,41 +112,65 @@ protected:
     }
 public:
     DoublyLinkedList() :_first(nullptr), _last(nullptr), _countNodes(0) {}
-    DoublyLinkedList(const DoublyLinkedList& list) {
-        this->_first = list._first;
-        this->_last = list._last;
-        this->_countNodes = list._countNodes;
+    DoublyLinkedList(const DoublyLinkedList<T>& list) {
+        if (!(list.getCountNodes())) throw std::runtime_error("Вы передаёте пустой список");
+        if (list.getCountNodes() < 2) {
+            this->_first = new Node<T>(list.getFirst()->getValue(), list.getFirst()->getDegree()); 
+            this->_first->setNext(this->_first);
+            this->_first->setPrev(this->_first);
+        }
+        //this->setCountNodes(list.getCountNodes());
+        Node<T>* item = list.getFirst();
+        //Node<T>* item2 = list.getFirst()->getNext();
+        this->_first = new Node<T>(item->getValue(), item->getDegree());
+        this->_last = this->_first;
+        this->_first->setNext(this->_first);
+        this->_first->setPrev(this->_first);
+        this->_last->setNext(this->_first);
+        this->_last->setPrev(this->_first);
+        this->setCountNodes(1);
+        item = item->getNext();
+
+        for (size_t i = 2; i <= list.getCountNodes(); ++i)
+        {
+            //item = item->getNext();
+            Node<T>* newItem = new Node<T>(item->getValue(), item->getDegree());
+            this->push_tail( *newItem );
+            item = item->getNext();
+        }
     }
     DoublyLinkedList(Node<T>* _first, Node<T>* _last, const size_t& _countNodes):
         _first(_first), _last(_last), _countNodes(_countNodes){}
     void push_tail(T value) {
         if (this->_first == nullptr) {
-            this->_first = new Node<T>(value);
+            this->_first = new Node<T>(value, this->_countNodes);
             this->_first->setNext(this->_first);
             this->_first->setPrev(this->_first);
             this->_last = this->_first;
             this->_countNodes++;
             return;
         }
-        this->_last->setNext(new Node<T>(value));
-        this->_last->setPrev(this->_last);
+        this->_last->setNext(new Node<T>(value, this->_countNodes));
+        this->_last->getNext()->setPrev(this->_last);
         this->_last = this->_last->getNext();
+        this->_last->setNext(this->_first);
         this->_first->setPrev(this->_last);
         this->_countNodes++;
         return;
     }
-    void push_tail(const Node<T>& node) {
+    void push_tail(Node<T>& node) {
         if (this->_first == nullptr) {
-            this->_first = node;
+            this->_first = &node;
             this->_first->setNext(this->_first);
             this->_first->setPrev(this->_first);
             this->_last = this->_first;
             this->_countNodes++;
             return;
         }
-        this->_last->setNext(node);
-        this->_last->setPrev(this->_last);
+        this->_last->setNext(&node);
+        this->_last->getNext()->setPrev(this->_last);
         this->_last = this->_last->getNext();
+        this->_last->setNext(this->_first);
         this->_first->setPrev(this->_last);
         this->_countNodes++;
         return;
@@ -144,14 +178,55 @@ public:
     // вставляет другой список в конец данного,
     // ВАЖНО: !!!метод использует те же указатели, что и изначальный список!!!
     void push_tail(const DoublyLinkedList& list) {
-        if (list.getFirst() == nullptr) { return; }
+        /*if (list.getFirst() == nullptr) { return; }
         if (this->_first == nullptr) {
             *this = list;
         }
         this->_last->setNext(list.getFirst());
         this->_last = list.getLast();
         this->_first->setPrev(this->_last);
-        this->_countNodes += list.getCountNodes();
+        this->_countNodes += list.getCountNodes();*/
+
+        /*DoublyLinkedList listCopy = *(new DoublyLinkedList(list));
+        if (listCopy.getFirst() == nullptr) { return; }
+        if (this->_first == nullptr) {
+            *this = listCopy;
+        }
+        this->_last->setNext(listCopy.getFirst());
+        this->_last->getNext()->setPrev(this->_last);
+        this->_last = listCopy.getLast();
+        this->_last->setNext(this->_first);
+        this->_first->setPrev(this->_last);
+        this->_countNodes += listCopy.getCountNodes();
+        return;*/
+
+
+
+        if (!(list.getCountNodes())) return;
+        if (list.getCountNodes() < 2) {
+            this->_first = new Node<T>(list.getFirst()->getValue(), list.getFirst()->getDegree());
+            this->_first->setNext(this->_first);
+            this->_first->setPrev(this->_first);
+        }
+        //this->setCountNodes(list.getCountNodes());
+        Node<T>* item = list.getFirst();
+        //Node<T>* item2 = list.getFirst()->getNext();
+        this->_first = new Node<T>(item->getValue(), item->getDegree());
+        this->_last = this->_first;
+        this->_first->setNext(this->_first);
+        this->_first->setPrev(this->_first);
+        this->_last->setNext(this->_first);
+        this->_last->setPrev(this->_first);
+        this->setCountNodes(1);
+        item = item->getNext();
+
+        for (size_t i = 2; i <= list.getCountNodes(); ++i)
+        {
+            //item = item->getNext();
+            Node<T>* newItem = new Node<T>(item->getValue(), item->getDegree());
+            this->push_tail(*newItem);
+            item = item->getNext();
+        }
     }
     void push_head(T value) {
         if (this->_first == nullptr) {
@@ -166,19 +241,20 @@ public:
         this->_first->getPrev()->setNext(this->_first);
         this->_first = this->_first->getPrev();
         this->_first->setPrev(this->_last);
+        this->_last->setNext(this->_first);
         this->_countNodes++;
         return;
     }
-    void push_head(const Node<T>& node) {
+    void push_head(Node<T>& node) {
         if (this->_first == nullptr) {
-            this->_first = node;
+            this->_first = &node;
             this->_first->setNext(this->_first);
             this->_first->setPrev(this->_first);
             this->_last = this->_first;
             this->_countNodes++;
             return;
         }
-        this->_first->setPrev(node);
+        this->_first->setPrev(&node);
         this->_first->getPrev()->setNext(this->_first);
         this->_first = this->_first->getPrev();
         this->_first->setPrev(this->_last);
@@ -225,7 +301,7 @@ public:
     }
     void print() const {
         auto node = this->_first;
-        for (size_t i = 0; node != nullptr; ++i) {
+        for (size_t i = 1; i <= this->_countNodes; ++i) {
             std::cout << i << ") ";
             node->print();
             std::cout << std::endl;
@@ -234,9 +310,9 @@ public:
     }
     Node<T>* getFirst() const { return this->_first; }
     Node<T>* getLast() const { return this->_last; }
-    Node<T>* getCountNodes() const { return this->_countNodes; }
-    Node<T>* findInInd(size_t index) {
-        if (index < this->_countNodes) const {
+    size_t getCountNodes() const { return this->_countNodes; }
+    Node<T>* findInInd(size_t index) const {
+        if (index < this->_countNodes) {
             Node<T>* node = this->_first;
             for (size_t i = 0; i != index; i++)
             {
@@ -268,15 +344,20 @@ public:
         this->swap(*this, other);
         return *this;
     }
-    DoublyLinkedList<T>& operator+= (Node<T>& node) {
+    DoublyLinkedList<T>& operator+= (Node<T>* node) {
         if (this->_first == nullptr) {
-            this->_first = &node;
+            this->_first = node;
+            this->_first->setNext(this->_first);
+            this->_first->setPrev(this->_first);
             this->_last = this->_first;
             this->_countNodes++;
             return *this;
         }
-        this->_last->setNext(&node);
+        this->_last->setNext(node);
+        this->_last->getNext()->setPrev(this->_last);
         this->_last = this->_last->getNext();
+        this->_last->setNext(this->_first);
+        this->_first->setPrev(this->_last);
         this->_countNodes++;
         return *this;
     }
@@ -302,7 +383,8 @@ public:
     
     ~DoublyLinkedList() {
         Node<T>* node = this->_first;
-        while (node != nullptr) {
+        for (size_t i = 1; i <= this->_countNodes; ++i)
+        {
             Node<T>* next = node->getNext();
             delete node;
             node = next;
@@ -310,4 +392,14 @@ public:
     }
 };
 
-
+template<typename T>
+double resultOfPolinomial(const DoublyLinkedList<T>& list) {
+    Node<T>* item = list.getFirst();
+    double res = 0;
+    for (size_t i = 1; i <= list.getCountNodes(); ++i)
+    {
+        res += powl(item->getValue(), item->getDegree());
+        item = item->getNext();
+    }
+    return res;
+}
