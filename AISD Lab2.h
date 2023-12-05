@@ -1,13 +1,14 @@
 ﻿#pragma once
 
 #include <iostream>
+#include <random>
 #include <string>
 #include "includes/Lab1.h"
 
 template <typename T>
 class Node {
 private:
-    T _val;
+    double _val;
     size_t _degree;
     Node<T>* _next;
     Node<T>* _prev;
@@ -97,6 +98,53 @@ private:
     Node<T>* _first;
     Node<T>* _last;
     size_t _countNodes;
+    //void randomPasteDouble(size_t length) {
+    //    std::random_device rd;   // non-deterministic generator
+    //    std::mt19937 gen(rd());  // to seed mersenne twister.
+    //    std::uniform_real_distribution<> dist(0, 20);
+    //    if (length == 1) {
+    //        this->_first = new Node<T>(dist(gen), 0);
+    //        this->_last = this->_first;
+    //        this->_first->setNext(this->_last);
+    //        this->_first->setPrev(this->_last);
+    //        return;
+    //    }
+    //    this->_first = new Node<T>(dist(gen), 0);
+    //    this->_last = new Node<T>(dist(gen), 1);
+    //    this->_first->setNext(this->_last);
+    //    this->_first->setPrev(this->_last);
+    //    this->_last->setNext(this->_first);
+    //    this->_last->setPrev(this->_first);
+    //    this->_countNodes = 2;
+    //    for (size_t i = 2; i < length; ++i)
+    //    {
+    //        this->push_tail(*(new Node<T>(dist(gen), i)));
+    //    }
+    //}
+    //void randomPasteInt(size_t length) {
+    //    std::random_device rd;   // non-deterministic generator
+    //    std::mt19937 gen(rd());  // to seed mersenne twister.
+    //    std::uniform_int_distribution<> dist(0, 20);
+    //    if (length == 1) {
+    //        double rnd = dist(gen);
+    //        this->_first = new Node<T>(T(rnd), 0);
+    //        this->_last = this->_first;
+    //        this->_first->setNext(this->_last);
+    //        this->_first->setPrev(this->_last);
+    //        return;
+    //    }
+    //    this->_first = new Node<T>(dist(gen), 0);
+    //    this->_last = new Node<T>(dist(gen), 1);
+    //    this->_first->setNext(this->_last);
+    //    this->_first->setPrev(this->_last);
+    //    this->_last->setNext(this->_first);
+    //    this->_last->setPrev(this->_first);
+    //    this->_countNodes = 2;
+    //    for (size_t i = 2; i < length; ++i)
+    //    {
+    //        this->push_tail(*(new Node<T>(dist(gen), i)));
+    //    }
+    //}
 protected:
     void setFirst(Node<T>* first) {
         this->_first = first;
@@ -141,6 +189,75 @@ public:
     }
     DoublyLinkedList(Node<T>* _first, Node<T>* _last, const size_t& _countNodes):
         _first(_first), _last(_last), _countNodes(_countNodes){}
+    DoublyLinkedList(function_class::Function<T> func) {
+        function_class::Function<T> funcCopy = func;
+        funcCopy.shrink_to_fit();
+        size_t secInd = 0;
+        for (size_t i = 0; i <= funcCopy.getMaxDegree(); ++i)
+        {
+            if (funcCopy.getCoef(i) == 0) continue;
+            Node<T>* item = new Node<T>(funcCopy.getCoef(i), i);
+            Node<T>* item2 = nullptr;
+            for (size_t j = i+1; j <= funcCopy.getMaxDegree(); ++j)
+            {
+                if (funcCopy.getCoef(j) == 0) continue;
+                item2 = new Node<T>(funcCopy.getCoef(j), j);
+                secInd = j;
+                i = j;
+                break;
+            }
+            if (item2 == nullptr) return;
+            this->_first = item;
+            this->_last = item2;
+            this->_first->setNext(this->_last);
+            this->_first->setPrev(this->_last);
+            this->_last->setNext(this->_first);
+            this->_last->setPrev(this->_first);
+            this->_countNodes = 2;
+            if (i == funcCopy.getMaxDegree() - 1) return;
+            break;
+        }
+        for (size_t i = secInd + 1; i <= funcCopy.getMaxDegree(); ++i)
+        {
+            if (funcCopy.getCoef(i) == 0) continue;
+            this->push_tail(*(new Node<T>(funcCopy.getCoef(i), i)));
+        }
+    }
+    //DoublyLinkedList(size_t length) {
+    //    //std::cout << typeid(T).name() << std::endl;
+    //    if (typeid(T).name() == "float" ||
+    //        typeid(T).name() == "double")
+    //    {  
+    //        this->randomPasteDouble(length);
+    //    }
+    //    else if(typeid(T).name() == "int") {
+    //        this->randomPasteInt(length);
+    //    }
+
+
+    //    //if (length == 0) return;
+    //    //std::random_device rd;   // non-deterministic generator
+    //    //std::mt19937 gen(rd());  // to seed mersenne twister.
+    //    //std::uniform_real_distribution<> dist(0, 20);
+    //    //if (length == 1) {
+    //    //    this->_first = new Node<T>(dist(gen), 0);
+    //    //    this->_last = this->_first;
+    //    //    this->_first->setNext(this->_last);
+    //    //    this->_first->setPrev(this->_last);
+    //    //    return;
+    //    //}
+    //    //this->_first = new Node<T>(dist(gen), 0);
+    //    //this->_last = new Node<T>(dist(gen), 1);
+    //    //this->_first->setNext(this->_last);
+    //    //this->_first->setPrev(this->_last);
+    //    //this->_last->setNext(this->_first);
+    //    //this->_last->setPrev(this->_first);
+    //    //this->_countNodes = 2;
+    //    //for (size_t i = 2; i < length; ++i)
+    //    //{
+    //    //    this->push_tail(*(new Node<T>(dist(gen), i)));
+    //    //}
+    //}
     void push_tail(T value) {
         if (this->_first == nullptr) {
             this->_first = new Node<T>(value, this->_countNodes);
@@ -176,57 +293,18 @@ public:
         return;
     }
     // вставляет другой список в конец данного,
-    // ВАЖНО: !!!метод использует те же указатели, что и изначальный список!!!
+    // ВАЖНО: !!!метод использует новую память, в отличие от изначального списка!!!
     void push_tail(const DoublyLinkedList& list) {
-        /*if (list.getFirst() == nullptr) { return; }
-        if (this->_first == nullptr) {
-            *this = list;
-        }
-        this->_last->setNext(list.getFirst());
-        this->_last = list.getLast();
-        this->_first->setPrev(this->_last);
-        this->_countNodes += list.getCountNodes();*/
-
-        /*DoublyLinkedList listCopy = *(new DoublyLinkedList(list));
-        if (listCopy.getFirst() == nullptr) { return; }
-        if (this->_first == nullptr) {
-            *this = listCopy;
-        }
-        this->_last->setNext(listCopy.getFirst());
-        this->_last->getNext()->setPrev(this->_last);
-        this->_last = listCopy.getLast();
-        this->_last->setNext(this->_first);
-        this->_first->setPrev(this->_last);
-        this->_countNodes += listCopy.getCountNodes();
-        return;*/
-
-
-
-        if (!(list.getCountNodes())) return;
-        if (list.getCountNodes() < 2) {
-            this->_first = new Node<T>(list.getFirst()->getValue(), list.getFirst()->getDegree());
-            this->_first->setNext(this->_first);
-            this->_first->setPrev(this->_first);
-        }
-        //this->setCountNodes(list.getCountNodes());
-        Node<T>* item = list.getFirst();
-        //Node<T>* item2 = list.getFirst()->getNext();
-        this->_first = new Node<T>(item->getValue(), item->getDegree());
-        this->_last = this->_first;
-        this->_first->setNext(this->_first);
-        this->_first->setPrev(this->_first);
-        this->_last->setNext(this->_first);
-        this->_last->setPrev(this->_first);
-        this->setCountNodes(1);
-        item = item->getNext();
-
-        for (size_t i = 2; i <= list.getCountNodes(); ++i)
+        for (size_t i = 0; i < list.getCountNodes(); i++)
         {
-            //item = item->getNext();
-            Node<T>* newItem = new Node<T>(item->getValue(), item->getDegree());
-            this->push_tail(*newItem);
-            item = item->getNext();
+            Node<T>* item = new Node<T>(list.findInInd(i)->getValue(), list.findInInd(i)->getDegree());
+            this->_last->setNext(item);
+            this->_last->getNext()->setPrev(this->_last);
+            this->_last = this->_last->getNext();
+            this->_last->setNext(this->_first);
+            this->_first->setPrev(this->_last);
         }
+        this->_countNodes += list.getCountNodes();
     }
     void push_head(T value) {
         if (this->_first == nullptr) {
@@ -262,19 +340,18 @@ public:
         return;
     }
     // вставляет другой список в начало данного,
-    // ВАЖНО: !!!метод использует те же указатели, что и изначальный список!!!
+    // ВАЖНО: !!!метод использует новую память, в отличие от изначального списка!!!
     void push_head(const DoublyLinkedList& list) {
-        if (list.getFirst() == nullptr) { return; }
-        if (this->_first == nullptr) {
-            *this = list;
+        for (int i = list.getCountNodes() - 1; i >= 0; --i)
+        {
+            Node<T>* item = new Node<T>(list.findInInd(i)->getValue(), list.findInInd(i)->getDegree());
+            this->_first->setPrev(item);
+            this->_first->getPrev()->setNext(this->_first);
+            this->_first = this->_first->getPrev();
+            this->_last->setNext(this->_first);
+            this->_first->setPrev(this->_last);
         }
-        this->_first->setPrev(list.getLast());
-        this->_first->getPrev()->setNext(this->_first);
-        this->_first = list.getFirst();
-        this->_first->setPrev(this->_last);
-        this->_last->setNext(this->_first);
-        this->_countNodes++;
-        return;
+        this->_countNodes += list.getCountNodes();
     }
     Node<T>* pop_head() {
         this->_last->setNext(this->_first->getNext());
@@ -282,6 +359,7 @@ public:
         newFirst->setPrev(this->_last);
         delete this->_first;
         this->_first = newFirst;
+        this->_countNodes--;
         return this->_first;
     }
     Node<T>* pop_tail() {
@@ -290,10 +368,11 @@ public:
         newLast->setNext(this->_first);
         delete this->_last;
         this->_last = newLast;
+        this->_countNodes--;
         return this->_last;
     }
     void delete_node(std::string info) {
-        for (size_t i = 0; this->getCountNodes() != 0; --(this->getCountNodes()))
+        for (int i = this->getCountNodes() - 1; i >= 0; --i)
         {
             this->pop_head();
         }
@@ -345,20 +424,7 @@ public:
         return *this;
     }
     DoublyLinkedList<T>& operator+= (Node<T>* node) {
-        if (this->_first == nullptr) {
-            this->_first = node;
-            this->_first->setNext(this->_first);
-            this->_first->setPrev(this->_first);
-            this->_last = this->_first;
-            this->_countNodes++;
-            return *this;
-        }
-        this->_last->setNext(node);
-        this->_last->getNext()->setPrev(this->_last);
-        this->_last = this->_last->getNext();
-        this->_last->setNext(this->_first);
-        this->_first->setPrev(this->_last);
-        this->_countNodes++;
+        this->push_tail(*node);
         return *this;
     }
     bool operator==(const DoublyLinkedList& other) const
@@ -393,13 +459,11 @@ public:
 };
 
 template<typename T>
-double resultOfPolinomial(const DoublyLinkedList<T>& list) {
-    Node<T>* item = list.getFirst();
+double resultOfPolinomial(const DoublyLinkedList<T>& list, double x) {
     double res = 0;
-    for (size_t i = 1; i <= list.getCountNodes(); ++i)
+    for (size_t i = 0; i < list.getCountNodes(); ++i)
     {
-        res += powl(item->getValue(), item->getDegree());
-        item = item->getNext();
+        res += list.findInInd(i)->getValue() * powl(x,list.findInInd(i)->getDegree());
     }
     return res;
 }

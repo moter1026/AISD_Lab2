@@ -84,45 +84,102 @@ int main()
 
     std::cout << "\n\n";
 
+    // Добавление другого списка в конец
     {
-        std::cout << "Добавление другого списка в конец и в начало\n\n";
+        std::cout << "Добавление другого списка в конец\n\n";
         DoublyLinkedList<int> iList2;
         iList2.push_tail(121);
         iList2.push_tail(232);
         iList2.push_tail(343);
+        iList2.push_tail(454);
 
         iList.push_tail(iList2);
         iList.print();
+    }
+
+    std::cout << "\n\n";
+
+    // Добавление другого списка в начало
+    {
+        std::cout << "Добавление другого списка в начало\n\n";
+        DoublyLinkedList<int> iList2;
+        iList2.push_tail(111);
+        iList2.push_tail(222);
+        iList2.push_tail(333);
+        iList2.push_tail(444);
+
+        iList.push_head(iList2);
+        iList.print();
+    }
+
+    std::cout << "\n\n";
+
+    // Добавление элемента при помощи оператора +=
+    {
+        std::cout << "Добавление элемента при помощи оператора +=\n\n";
+        Node<int>* item = new Node<int>(555);
+        iList += item;
+        iList.print();
+    }
+
+    std::cout << "\n\n";
+
+    // удаление эл-та из начала списка
+    {
+        std::cout << "удаление эл-та из начала списка\n\n";
+        DoublyLinkedList<int> iList2;
+
+        iList.pop_head();
+        iList.print();
+    }
+
+    std::cout << "\n\n";
+
+    // удаление эл-та из конца списка
+    {
+        std::cout << "удаление эл-та из конца списка\n\n";
+        DoublyLinkedList<int> iList2;
+
+        iList.pop_tail();
+        iList.print();
+    }
+
+    std::cout << "\n\n";
+
+    // удаление всех эл-ов Node с информационным полем
+    {
+        std::cout << "удаление всех эл-ов Node с информационным полем\n\n";
+        iList.delete_node("Удалил все элементы списка");
+        iList.print();
+    }
+
+    std::cout << "\n\n";
+    
+    // Выполнение задания с функциями
+    {
+        function_class::Function<int> FuncInt1(5, true);
+        std::cout << FuncInt1 << std::endl;
+
+        DoublyLinkedList<int> iList2(FuncInt1);
+        iList2.print();
+
+        std::cout << std::endl << resultOfPolinomial(iList2, 10) << std::endl;
 
     }
 
-    
-    /*std::cout << std::endl;
-    std::cout << "3)";
-    iList.findInInd(3)->print();
+    std::cout << "\n\n";
 
-    std::cout << std::endl;
-    std::cout << "2)";
-    iList.findInVal(33)->print();
+    // Заполняет рандомными числами при помощи конструктора
+    {
+        //function_class::Function<int> FuncInt1(5, true);
+        //std::cout << FuncInt1 << std::endl;
 
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
+        DoublyLinkedList<int> iList2(10);
+        iList2.print();
 
+        std::cout << std::endl << resultOfPolinomial(iList2, 10) << std::endl;
 
-    DoublyLinkedList<std::string> sList;
-    sList.addNode(*(new std::string("привет")));
-    sList.addNode(*(new std::string("я")));
-    sList.addNode(*(new std::string("список")));
-    sList.addNode(*(new std::string("в")));
-    sList += *(new Node<std::string>(*(new std::string("C++"))));
-    sList.print();
-    std::cout << std::endl;
-    std::cout << "3)";
-    auto nodeWord = sList.findInInd(3);
-    nodeWord->print();
-    std::cout << std::endl;
-    std::cout << "2)";
-    sList.findInVal("список")->print();*/
+    }
+
 }
 

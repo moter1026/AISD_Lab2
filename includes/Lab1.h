@@ -24,7 +24,7 @@ namespace function_class {
 		long double solution;
 		virtual void fillngCoefficientsNotRandom(int maxDegree) { };
 		virtual void fillngCoefficientsRandom(int maxDegree) { }
-		void swap(StartFunction<T>& copy) noexcept{
+		void swap(StartFunction<T> copy) noexcept{
 			std::swap(this->typeOfT, copy.typeOfT);
 			std::swap(this->maxDegree, copy.maxDegree);
 			for (size_t i = 0; i <= this->maxDegree; i++) {
@@ -211,10 +211,6 @@ namespace function_class {
 			long double beta = cbrtl(-((long double)q / 2) - sqrtl(Q));
 			//std::cout << "beta = " << beta << std::endl;
 			this->solution = (long double)(alpha + beta) - ((long double)b / ((long double)3 * (long double)a));
-
-
-
-			
 		};
 		void printSolution() noexcept {
 			std::cout << this->solution << std::endl;
