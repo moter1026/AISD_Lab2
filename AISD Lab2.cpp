@@ -114,6 +114,20 @@ int main()
 
     std::cout << "\n\n";
 
+    // Добавление элемента со степенью
+    {
+        std::cout << "Добавление элемента со степенью\n\n";
+        iList.push_tail(77, 4);
+        iList.print();
+        std::cout << "\n\n";
+
+        iList.push_head(88, 7);
+        iList.print();
+        std::cout << "\n\n";
+    }
+
+    std::cout << "\n\n";
+
     // Добавление элемента при помощи оператора +=
     {
         std::cout << "Добавление элемента при помощи оператора +=\n\n";
@@ -146,6 +160,27 @@ int main()
 
     std::cout << "\n\n";
 
+    // удаление элемента по значению 
+    {
+        std::cout << "удаление элемента по значению 33\n\n";
+        iList.delete_node(33);
+        iList.print();
+
+        std::cout << "\n";
+
+        std::cout << "удаление элемента по значению 55\n\n";
+        iList.delete_node(55);
+        iList.print();
+
+        std::cout << "\n";
+
+        std::cout << "удаление элемента по значению 121\n\n";
+        iList.delete_node(121);
+        iList.print();
+    }
+
+    std::cout << "\n\n";
+
     // удаление всех эл-ов Node с информационным полем
     {
         std::cout << "удаление всех эл-ов Node с информационным полем\n\n";
@@ -162,8 +197,15 @@ int main()
 
         DoublyLinkedList<int> iList2(FuncInt1);
         iList2.print();
-
-        std::cout << std::endl << resultOfPolinomial(iList2, 10) << std::endl;
+        
+        std::cout << "\n";
+        std::cout << "Вставляем элемент 1000 со степенью 3 в конец\n";
+        iList2.push_tail(1000, 3);
+        iList2.print();
+        std::cout << "Вставляем элемент 2000 со степенью 5 в начало\n";
+        iList2.push_head(2000, 5);
+        iList2.print();
+        std::cout << std::endl << resultOfPolinomial(iList2, 2) << std::endl;
 
     }
 
@@ -171,8 +213,6 @@ int main()
 
     // Заполняет рандомными числами при помощи конструктора
     {
-        //function_class::Function<int> FuncInt1(5, true);
-        //std::cout << FuncInt1 << std::endl;
 
         DoublyLinkedList<int> iList2(10);
         iList2.print();

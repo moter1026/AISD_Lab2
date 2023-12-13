@@ -98,53 +98,6 @@ private:
     Node<T>* _first;
     Node<T>* _last;
     size_t _countNodes;
-    //void randomPasteDouble(size_t length) {
-    //    std::random_device rd;   // non-deterministic generator
-    //    std::mt19937 gen(rd());  // to seed mersenne twister.
-    //    std::uniform_real_distribution<> dist(0, 20);
-    //    if (length == 1) {
-    //        this->_first = new Node<T>(dist(gen), 0);
-    //        this->_last = this->_first;
-    //        this->_first->setNext(this->_last);
-    //        this->_first->setPrev(this->_last);
-    //        return;
-    //    }
-    //    this->_first = new Node<T>(dist(gen), 0);
-    //    this->_last = new Node<T>(dist(gen), 1);
-    //    this->_first->setNext(this->_last);
-    //    this->_first->setPrev(this->_last);
-    //    this->_last->setNext(this->_first);
-    //    this->_last->setPrev(this->_first);
-    //    this->_countNodes = 2;
-    //    for (size_t i = 2; i < length; ++i)
-    //    {
-    //        this->push_tail(*(new Node<T>(dist(gen), i)));
-    //    }
-    //}
-    //void randomPasteInt(size_t length) {
-    //    std::random_device rd;   // non-deterministic generator
-    //    std::mt19937 gen(rd());  // to seed mersenne twister.
-    //    std::uniform_int_distribution<> dist(0, 20);
-    //    if (length == 1) {
-    //        double rnd = dist(gen);
-    //        this->_first = new Node<T>(T(rnd), 0);
-    //        this->_last = this->_first;
-    //        this->_first->setNext(this->_last);
-    //        this->_first->setPrev(this->_last);
-    //        return;
-    //    }
-    //    this->_first = new Node<T>(dist(gen), 0);
-    //    this->_last = new Node<T>(dist(gen), 1);
-    //    this->_first->setNext(this->_last);
-    //    this->_first->setPrev(this->_last);
-    //    this->_last->setNext(this->_first);
-    //    this->_last->setPrev(this->_first);
-    //    this->_countNodes = 2;
-    //    for (size_t i = 2; i < length; ++i)
-    //    {
-    //        this->push_tail(*(new Node<T>(dist(gen), i)));
-    //    }
-    //}
 protected:
     void setFirst(Node<T>* first) {
         this->_first = first;
@@ -223,41 +176,40 @@ public:
             this->push_tail(*(new Node<T>(funcCopy.getCoef(i), i)));
         }
     }
-    //DoublyLinkedList(size_t length) {
-    //    //std::cout << typeid(T).name() << std::endl;
-    //    if (typeid(T).name() == "float" ||
-    //        typeid(T).name() == "double")
-    //    {  
-    //        this->randomPasteDouble(length);
-    //    }
-    //    else if(typeid(T).name() == "int") {
-    //        this->randomPasteInt(length);
-    //    }
-
-
-    //    //if (length == 0) return;
-    //    //std::random_device rd;   // non-deterministic generator
-    //    //std::mt19937 gen(rd());  // to seed mersenne twister.
-    //    //std::uniform_real_distribution<> dist(0, 20);
-    //    //if (length == 1) {
-    //    //    this->_first = new Node<T>(dist(gen), 0);
-    //    //    this->_last = this->_first;
-    //    //    this->_first->setNext(this->_last);
-    //    //    this->_first->setPrev(this->_last);
-    //    //    return;
-    //    //}
-    //    //this->_first = new Node<T>(dist(gen), 0);
-    //    //this->_last = new Node<T>(dist(gen), 1);
-    //    //this->_first->setNext(this->_last);
-    //    //this->_first->setPrev(this->_last);
-    //    //this->_last->setNext(this->_first);
-    //    //this->_last->setPrev(this->_first);
-    //    //this->_countNodes = 2;
-    //    //for (size_t i = 2; i < length; ++i)
-    //    //{
-    //    //    this->push_tail(*(new Node<T>(dist(gen), i)));
-    //    //}
-    //}
+    DoublyLinkedList(T val) {
+        function_class::Function<T> funcCopy(val-1);
+        funcCopy.shrink_to_fit();
+        size_t secInd = 0;
+        for (size_t i = 0; i <= funcCopy.getMaxDegree(); ++i)
+        {
+            if (funcCopy.getCoef(i) == 0) continue;
+            Node<T>* item = new Node<T>(funcCopy.getCoef(i), i);
+            Node<T>* item2 = nullptr;
+            for (size_t j = i + 1; j <= funcCopy.getMaxDegree(); ++j)
+            {
+                if (funcCopy.getCoef(j) == 0) continue;
+                item2 = new Node<T>(funcCopy.getCoef(j), j);
+                secInd = j;
+                i = j;
+                break;
+            }
+            if (item2 == nullptr) return;
+            this->_first = item;
+            this->_last = item2;
+            this->_first->setNext(this->_last);
+            this->_first->setPrev(this->_last);
+            this->_last->setNext(this->_first);
+            this->_last->setPrev(this->_first);
+            this->_countNodes = 2;
+            if (i == funcCopy.getMaxDegree() - 1) return;
+            break;
+        }
+        for (size_t i = secInd + 1; i <= funcCopy.getMaxDegree(); ++i)
+        {
+            if (funcCopy.getCoef(i) == 0) continue;
+            this->push_tail(*(new Node<T>(funcCopy.getCoef(i), i)));
+        }
+    }
     void push_tail(T value) {
         if (this->_first == nullptr) {
             this->_first = new Node<T>(value, this->_countNodes);
@@ -268,6 +220,23 @@ public:
             return;
         }
         this->_last->setNext(new Node<T>(value, this->_countNodes));
+        this->_last->getNext()->setPrev(this->_last);
+        this->_last = this->_last->getNext();
+        this->_last->setNext(this->_first);
+        this->_first->setPrev(this->_last);
+        this->_countNodes++;
+        return;
+    }
+    void push_tail(T value, size_t degree) {
+        if (this->_first == nullptr) {
+            this->_first = new Node<T>(value, degree);
+            this->_first->setNext(this->_first);
+            this->_first->setPrev(this->_first);
+            this->_last = this->_first;
+            this->_countNodes++;
+            return;
+        }
+        this->_last->setNext(new Node<T>(value, degree));
         this->_last->getNext()->setPrev(this->_last);
         this->_last = this->_last->getNext();
         this->_last->setNext(this->_first);
@@ -289,6 +258,8 @@ public:
         this->_last = this->_last->getNext();
         this->_last->setNext(this->_first);
         this->_first->setPrev(this->_last);
+
+        this->_last->setDegree(node.getDegree());
         this->_countNodes++;
         return;
     }
@@ -339,6 +310,23 @@ public:
         this->_countNodes++;
         return;
     }
+    void push_head(T value, size_t degree) {
+        if (this->_first == nullptr) {
+            this->_first = new Node<T>(value, degree);
+            this->_first->setNext(this->_first);
+            this->_first->setPrev(this->_first);
+            this->_last = this->_first;
+            this->_countNodes++;
+            return;
+        }
+        this->_first->setPrev(new Node<T>(value, degree));
+        this->_first->getPrev()->setNext(this->_first);
+        this->_first = this->_first->getPrev();
+        this->_first->setPrev(this->_last);
+        this->_last->setNext(this->_first);
+        this->_countNodes++;
+        return;
+    }
     // вставляет другой список в начало данного,
     // ВАЖНО: !!!метод использует новую память, в отличие от изначального списка!!!
     void push_head(const DoublyLinkedList& list) {
@@ -378,12 +366,49 @@ public:
         }
         std::cout << "\n" << info << "\n";
     }
+    //// Вставляет элемент в зависимости от степени
+    //void push_el(T value, size_t degree) {
+    //    if (this->_first == nullptr) {
+    //        this->_first = new Node<T>(value, degree);
+    //        this->_first->setNext(this->_first);
+    //        this->_first->setPrev(this->_first);
+    //        this->_last = this->_first;
+    //        this->_countNodes++;
+    //        return;
+    //    }
+    //    Node<T>* elem = this->_first;
+    //    for (size_t i = 0; i < this->_countNodes; i++)
+    //    {
+    //        if (elem->getDegree() <= degree && elem->getNext()->getDegree() >= degree ||
+    //            elem->getDegree() < degree && elem->getNext() == this->_first) {
+    //            Node<T>* seconEl = elem->getNext();
+    //            elem->setNext(new Node<T>(value, degree));
+    //            elem->getNext()->setPrev(elem);
+    //            elem->getNext()->setNext(seconEl);
+    //            seconEl->setPrev(elem->getNext());
+    //            this->_countNodes++;
+    //            if (elem->getNext()->getNext() == this->_first) {
+    //                this->_last = elem->getNext();
+    //            }
+    //            break;
+    //        }
+    //        elem = elem->getNext();
+    //    }
+    //    return;
+    //}
+    void delete_node(T val) {
+        Node<T>* elem = this->findInVal(val);
+        elem->getNext()->setPrev(elem->getPrev());
+        elem->getPrev()->setNext(elem->getNext());
+        delete elem;
+        this->_countNodes--;
+    }
     void print() const {
         auto node = this->_first;
         for (size_t i = 1; i <= this->_countNodes; ++i) {
             std::cout << i << ") ";
             node->print();
-            std::cout << std::endl;
+            std::cout << "\tx^" <<node->getDegree() << std::endl;
             node = node->getNext();
         }
     }
