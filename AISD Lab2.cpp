@@ -11,10 +11,13 @@ int main()
     DoublyLinkedList<int> iList;
     // работа push_tail
     iList.push_tail(11);
+    iList.push_tail(44);
     iList.push_tail(22);
+    iList.push_tail(44);
     iList.push_tail(33);
     iList.push_tail(44);
     iList.push_tail(*(new Node<int>(55)));
+    iList.push_tail(44);
     // работа push_head
     iList.push_head(00);
     iList.print();
@@ -160,21 +163,21 @@ int main()
 
     std::cout << "\n\n";
 
-    // удаление элемента по значению 
+    // удаление всех элементов по значению 
     {
-        std::cout << "удаление элемента по значению 33\n\n";
-        iList.delete_node(33);
+        std::cout << "удаление элементов по значению 44\n\n";
+        iList.delete_node(44);
         iList.print();
 
         std::cout << "\n";
 
-        std::cout << "удаление элемента по значению 55\n\n";
+        std::cout << "удаление элементов по значению 55\n\n";
         iList.delete_node(55);
         iList.print();
 
         std::cout << "\n";
 
-        std::cout << "удаление элемента по значению 121\n\n";
+        std::cout << "удаление элементов по значению 121\n\n";
         iList.delete_node(121);
         iList.print();
     }

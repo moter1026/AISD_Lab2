@@ -398,10 +398,14 @@ public:
     //}
     void delete_node(T val) {
         Node<T>* elem = this->findInVal(val);
-        elem->getNext()->setPrev(elem->getPrev());
-        elem->getPrev()->setNext(elem->getNext());
-        delete elem;
-        this->_countNodes--;
+        while (elem != nullptr)
+        {
+            elem->getNext()->setPrev(elem->getPrev());
+            elem->getPrev()->setNext(elem->getNext());
+            delete elem;
+            this->_countNodes--;
+            elem = this->findInVal(val);
+        }
     }
     void print() const {
         auto node = this->_first;
